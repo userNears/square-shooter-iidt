@@ -1,8 +1,10 @@
 import pygame
+from src import settings
+
 pygame.init()
 
 # skapa skärmen där höjden är 900 och breden är 700
-skärm = pygame.display.set_mode((900, 700))
+skärm = pygame.display.set_mode(settings.SCREEN_SIZE)
 
 
 
