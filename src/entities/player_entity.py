@@ -51,14 +51,14 @@ class Player:
         current_time = pygame.time.get_ticks()
 
         # Checking if cooldown time has passed
-        if current_time - self.last_fired >= settings.PROJECTILE_COOLDOWN:
+        if current_time - self.last_fired >= settings.projectile_cooldown:
             projectile = projectile_entity.Projectile(
                 x = self.x + self.width, 
                 y = self.y + self.height//2,
                 width = settings.PROJECTILE_WIDTH,
                 height = settings.PROJECTILE_HEIGHT,
                 speed = settings.PROJECTILE_SPEED,
-                color = settings.BLACK
+                color = settings.PROJECTILE_COLOR
             )
 
             self.projectiles.append(projectile)

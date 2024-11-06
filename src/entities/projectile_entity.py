@@ -20,5 +20,3 @@ class Projectile:
 
     def hitbox(self):
         return pygame.Rect(self.x, self.y, self.width, self.height)
-    
-

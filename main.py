@@ -52,21 +52,28 @@ def main():
         
         return enemies
     
-    # Spawn 1 enemy in the beginning
-    amount = 1
-    enemies = spawn_enemies(amount)
-
     def display_centered_text(text, font, size, color):
         font = pygame.font.SysFont(font, size)
         txt = font.render(text, True, color)
         txt_rect = txt.get_rect(center = (settings.SCREEN_WIDTH/2, settings.SCREEN_HEIGHT/2))
         
         screen.blit(txt, txt_rect)
+
+    def display_wave_counter(text, font, size, color):
+        font = pygame.font.SysFont(font, size)
+        txt = font.render(text, True, color)
+        screen.blit(txt, (10, 10))
     
     running = True
     paused = False
     game_over = False
     clock = pygame.time.Clock()
+
+    wave_count = 1 # Initial wave
+
+    # Spawn 1 enemy in the beginning
+    amount = 1
+    enemies = spawn_enemies(amount)
 
     while running:
         for event in pygame.event.get():
@@ -80,6 +87,7 @@ def main():
 
                 # Restart if a key is pressed in the game over screen
                 if game_over:
+                    settings.projectile_cooldown = settings.INITIAL_PROJECTILE_COOLDOWN
                     main()
 
         if not paused:
@@ -93,6 +101,13 @@ def main():
                 0, 
                 settings.DEFENSE_LINE_WIDTH, 
                 settings.SCREEN_HEIGHT)
+            )
+
+            display_wave_counter(
+                text = f"Wave {wave_count},             Time {time_elapsed}",
+                font = "arialblack",
+                size = 20,
+                color = settings.BLACK
             )
 
             # Drawing the player's HP
@@ -109,6 +124,10 @@ def main():
             player.render(screen)
 
             if not enemies:
+                wave_count += 1
+                if wave_count%3 == 0:
+                    settings.projectile_cooldown *= 0.85
+
                 amount += 1
                 enemies = spawn_enemies(amount)
 
@@ -120,7 +139,7 @@ def main():
                 # Remove enemy if it passes defense line
                 if enemy.x <= settings.DEFENSE_LINE_POS_X:
                     enemies.remove(enemy)
-                    player.health -= 1
+                    player.health -= settings.PROJECTILE_DAMAGE
 
                     if player.health <= 0:
                         game_over = True
@@ -160,7 +179,7 @@ def main():
 
         # Update screen
         pygame.display.flip()
-        clock.tick(60)
+        clock.tick(60) # Capping framerate at 60 FPS
 
 if __name__ == "__main__":
     main()
