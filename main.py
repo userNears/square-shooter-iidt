@@ -75,6 +75,9 @@ def main():
     amount = 1
     enemies = spawn_enemies(amount)
 
+    time_elapsed = 0
+    last_unpaused_time = pygame.time.get_ticks() / 1000 
+
     while running:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -84,13 +87,24 @@ def main():
                 # Toggle pause
                 if event.key == pygame.K_ESCAPE:
                     paused = not paused
+                    if not paused:
+                        # Resetting the last unpaused time when unpausing
+                        last_unpaused_time = pygame.time.get_ticks() / 1000
 
                 # Restart if a key is pressed in the game over screen
                 if game_over:
                     settings.projectile_cooldown = settings.INITIAL_PROJECTILE_COOLDOWN
                     main()
 
-        if not paused:
+        if not paused and not game_over:
+            current_time = pygame.time.get_ticks() / 1000
+            
+            # Time since last unpaused
+            time_elapsed += current_time - last_unpaused_time
+
+            # Resetting the last unpaused time to current time
+            last_unpaused_time = current_time 
+
             screen.fill(settings.BACKGROUND_COLOR)
 
             # Drawing the defense line
@@ -104,7 +118,7 @@ def main():
             )
 
             display_wave_counter(
-                text = f"Wave {wave_count},             Time {time_elapsed}",
+                text = f"Wave {wave_count},             Time {time_elapsed:.2f}s",
                 font = "arialblack",
                 size = 20,
                 color = settings.BLACK
