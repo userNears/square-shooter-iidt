@@ -12,7 +12,10 @@ class Enemy:
         self.health = health
 
     def render(self, screen):
-        pygame.draw.rect(screen, self.color, (self.x, self.y, self.width, self.height))
+        # Black rect for the border
+        pygame.draw.rect(screen, settings.BORDER_COLOR, (self.x, self.y, self.width, self.height))
+        # Enemy color
+        pygame.draw.rect(screen, self.color, (self.x + 3, self.y + 3, self.width - 6, self.height - 6))
 
     def update(self):
         # Able to move until passing defense line

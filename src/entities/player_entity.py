@@ -15,7 +15,8 @@ class Player:
         self.last_fired = 0 # Last fired in milliseconds
 
     def render(self, screen):
-        pygame.draw.rect(screen, self.color, (self.x, self.y, self.width, self.height))
+        pygame.draw.rect(screen, settings.BORDER_COLOR, (self.x, self.y, self.width, self.height))
+        pygame.draw.rect(screen, self.color, (self.x + 3, self.y + 3, self.width - 6, self.height - 6))
 
         # Render each projectile
         for projectile in self.projectiles:
