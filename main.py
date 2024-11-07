@@ -73,8 +73,8 @@ def main():
     def toggle_pause_game():
         # Accessing the variables from main()
         nonlocal paused, total_pause_time, latest_active_time
-        
-        # Toggle pause
+
+        # Toggle pause 
         paused = not paused
 
         # Getting the total pause time
@@ -133,8 +133,8 @@ def main():
     game_paused_buttons = [
         create_buttons.Button(
             text = "Continue",
-            font = "arialblack", 
-            size = 25, 
+            font = "arialblack",
+            size = 25,
             color = settings.TEXT_COLOR,
             x = settings.SCREEN_WIDTH / 2,
             y = settings.SCREEN_HEIGHT / 2,
@@ -187,6 +187,7 @@ def main():
     amount = 1
     enemies = spawn_enemies(amount)
     boss = None
+    died_to_boss = False
 
     launch_time = time.time()
     total_pause_time = 0
@@ -250,21 +251,24 @@ def main():
                 if wave_count%3 == 0:
                     settings.projectile_cooldown *= 0.85
 
-                if wave_count < 15:
+                if wave_count < settings.BOSS_WAVE:
                     # Increase enemy spawn every wave
                     amount += 1
                     enemies = spawn_enemies(amount)
                 else:
                     # Creating the boss
-                    boss = enemy_entity.Enemy(
-                    x = settings.SCREEN_WIDTH - 20, 
-                    y = settings.SCREEN_HEIGHT / 2 - settings.BOSS_HEIGHT / 2, 
-                    width = settings.BOSS_WIDTH, 
-                    height = settings.BOSS_HEIGHT, 
-                    color = settings.BOSS_COLOR, 
-                    speed = settings.BOSS_SPEED, 
-                    health = settings.BOSS_HEALTH
+                    boss = enemy_entity.Boss( 
+                        x = settings.SCREEN_WIDTH - 20, 
+                        y = settings.SCREEN_HEIGHT / 2 - settings.BOSS_HEIGHT / 2, 
+                        width = settings.BOSS_WIDTH, 
+                        height = settings.BOSS_HEIGHT, 
+                        color = settings.BOSS_COLOR, 
+                        speed = settings.BOSS_SPEED, 
+                        health = settings.BOSS_HEALTH
                     )
+
+                    enemies = spawn_enemies(amount + 5)
+
                     enemies.append(boss)
 
             for enemy in enemies[:]:
@@ -275,7 +279,21 @@ def main():
                 # Remove enemy and damage player if it passes defense line
                 if enemy.x <= settings.DEFENSE_LINE_POS_X:
                     enemies.remove(enemy)
+
+                    # Turn the defense line red for a split moment (Drawing over)
+                    pygame.draw.rect(
+                        screen, 
+                        settings.RED, (
+                            settings.DEFENSE_LINE_POS_X, 
+                            0, 
+                            settings.DEFENSE_LINE_WIDTH, 
+                            settings.SCREEN_HEIGHT
+                        )
+                    )
+
                     if enemy is boss:
+                        died_to_boss = True
+                        # Instantly kill the player
                         player.health = 0
                     else:
                         player.health -= 1
@@ -318,11 +336,11 @@ def main():
 
             for button in game_paused_buttons:
                 button.render(screen)
-        elif game_over:
+        elif game_over or game_won:
             screen.fill(settings.BACKGROUND_COLOR)
 
             display_centered_text(
-                text = "GAME OVER",
+                text = "GAME OVER" if game_over else "YOU WON!",
                 font = "arialblack", 
                 size = 40, 
                 color = settings.TEXT_COLOR,
@@ -330,44 +348,29 @@ def main():
                 y = settings.SCREEN_HEIGHT / 4
             )
 
-            display_centered_text(
-                text = f"You died on wave {wave_count} after {ingame_timer:.2f} seconds!",
-                font = "arialblack", 
-                size = 25, 
-                color = settings.TEXT_COLOR,
-                x = settings.SCREEN_WIDTH / 2,
-                y = settings.SCREEN_HEIGHT / 3
-            )
+            if game_over:
+                display_centered_text(
+                    text = f"You died on wave {wave_count} after {ingame_timer:.2f} seconds!"
+                        if not died_to_boss else 
+                        f"You died to the boss on wave {wave_count} after {ingame_timer:.2f} seconds!",
+                    font = "arialblack", 
+                    size = 25, 
+                    color = settings.TEXT_COLOR,
+                    x = settings.SCREEN_WIDTH / 2,
+                    y = settings.SCREEN_HEIGHT / 3
+                )
+            elif game_won:
+                    display_centered_text(
+                        text = f"You beat the boss on wave {wave_count} after {ingame_timer:.2f} seconds!",
+                        font = "arialblack", 
+                        size = 25, 
+                        color = settings.TEXT_COLOR,
+                        x = settings.SCREEN_WIDTH / 2,
+                        y = settings.SCREEN_HEIGHT / 3
+                    )
             
             for button in game_result_buttons:
                 button.render(screen)
-        elif game_won:
-            screen.fill(settings.BACKGROUND_COLOR)
-
-            ui()
-
-            display_centered_text(
-                text = "YOU WON!",
-                font = "arialblack", 
-                size = 40, 
-                color = settings.TEXT_COLOR,
-                x = settings.SCREEN_WIDTH / 2,
-                y = settings.SCREEN_HEIGHT / 4
-            )
-
-            display_centered_text(
-                text = f"You beat the boss on wave {wave_count} after {ingame_timer:.2f} seconds!",
-                font = "arialblack", 
-                size = 25, 
-                color = settings.TEXT_COLOR,
-                x = settings.SCREEN_WIDTH / 2,
-                y = settings.SCREEN_HEIGHT / 3
-            )
-
-            for button in game_result_buttons:
-                button.render(screen)
-
-
 
         # Update screen
         pygame.display.flip()
