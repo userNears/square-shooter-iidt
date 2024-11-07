@@ -181,7 +181,8 @@ def main():
         )
     ]
 
-    wave_count = 1 # Initial wave
+    # Initial wave
+    wave_count = 1
 
     # Spawn 1 enemy in the beginning
     amount = 1
