@@ -15,11 +15,13 @@ class Button:
         screen.blit(self.txt, self.txt_rect)
     
     def is_hovered(self):
+        # If mouse is over a button, change cursor
         mouse_pos = pygame.mouse.get_pos()
         if self.txt_rect.collidepoint(mouse_pos):
             pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
     
     def interact(self):
+        # Check if mouse is over button, execute a function
         mouse_pos = pygame.mouse.get_pos()
         if self.txt_rect.collidepoint(mouse_pos):
             self.action()

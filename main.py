@@ -9,7 +9,7 @@ import sys
 def main():
     pygame.init()
     # Game title
-    pygame.display.set_caption("Python Game Project")
+    pygame.display.set_caption("Square Shooter")
     # Screen size
     screen = pygame.display.set_mode((settings.SCREEN_WIDTH, settings.SCREEN_HEIGHT))
 
@@ -29,6 +29,7 @@ def main():
         health = settings.PLAYER_HEALTH
     )
 
+    # Function to spawn randomly between enemy type A and enemy type B
     def spawn_enemies(amount):
         enemies = []
         x = settings.SCREEN_WIDTH
